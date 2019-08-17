@@ -10,10 +10,11 @@ class Lumber:
     def __init__(self, token):
         self.token = 'Bearer ' + token
 
-    def log(self, message, level=0):
+    def log(self, message, code=None, level=0):
         self.print(message, level)
         trace = traceback.extract_stack(limit=3)
         payload = {
+            'code': code,
             'level': level,
             'message': message,
             'line': trace[0][1],
@@ -35,20 +36,20 @@ class Lumber:
         else:
             print(message)
 
-    def info(self, message):
-        response = self.log(message)
+    def info(self, message, code=None):
+        response = self.log(message, code)
 
-    def debug(self, message):
-        response = self.log(message, 1)
+    def debug(self, message, code=None):
+        response = self.log(message, code, 1)
 
-    def verbose(self, message):
-        response = self.log(message, 2)
+    def verbose(self, message, code=None):
+        response = self.log(message, code, 2)
 
-    def warning(self, message):
-        response = self.log(message, 3)
+    def warning(self, message, code=None):
+        response = self.log(message, code, 3)
 
-    def error(self, message):
-        response = self.log(message, 4)
+    def error(self, message, code=None):
+        response = self.log(message, code, 4)
 
-    def critical(self, message):
-        response = self.log(message, 5)
+    def critical(self, message, code=None):
+        response = self.log(message, code, 5)
