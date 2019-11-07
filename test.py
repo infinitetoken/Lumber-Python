@@ -1,9 +1,8 @@
-from Lumber import Lumber
+from .Lumber import Lumber
 
-lumber = Lumber('b07e9f00bdfb11e9b22a4f6283021c32')
+lumber = Lumber('2f621ef0018111ea93bd6d7e7482e49b')
 
 def testMethod():
-    lumber.log('Log', 5)
     lumber.info('Info')
     lumber.debug('Debug')
     lumber.verbose('Verbose')
