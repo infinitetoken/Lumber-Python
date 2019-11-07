@@ -1,5 +1,9 @@
 import requests
 from ..helpers import trace
+import logging
+
+logging.addLevelName(logging.DEBUG + 5, "VERBOSE")
+logger = logging.getLogger('lumber')
 
 def init(token):
     return Lumber(token)
@@ -10,20 +14,22 @@ class Lumber:
 
     def __init__(self, token, options={}):
         self.token = 'Bearer ' + token
-        self.local = True if 'local' in options and options.local else False
-        self.cloud = True if 'cloud' in options and options.cloud else False
+        self.local = False if 'local' in options and not options.local else True
+        self.cloud = False if 'cloud' in options and not options.cloud else True
 
     def log(self, message, code=None, level=0):
         if level == 1:
-            print(u'\x1b[34m{}\x1b[39m'.format(message))
+            logger.debug(u'\x1b[34m{}\x1b[39m'.format(message))
+        elif level == 2:
+            logger.log(logging.DEBUG + 5, message)
         elif level == 3:
-            print(u'\x1b[33m{}\x1b[39m'.format(message))
+            logger.warning(u'\x1b[33m{}\x1b[39m'.format(message))
         elif level == 4:
-            print(u'\x1b[31m{}\x1b[39m'.format(message))
+            logger.error(u'\x1b[31m{}\x1b[39m'.format(message))
         elif level == 5:
-            print(u'\x1b[38;5;208m{}\x1b[39m'.format(message))
+            logger.critical(u'\x1b[38;5;208m{}\x1b[39m'.format(message))
         else:
-            print(message)
+            logger.info(message)
 
     def logCloud(self, message, code=None, level=0):
         t = trace()
