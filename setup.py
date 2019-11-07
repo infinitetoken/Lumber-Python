@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='lumber-cloud',
-    version='0.0.1',
+    version='0.0.2',
     license='MIT',
     author='InfiniteToken',
     author_email='infinitetoken@gmail.com',
@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/infinitetoken/Lumber-Python',
-    download_url='https://github.com/infinitetoken/Lumber-Python/archive/0.0.1.tar.gz',
+    download_url='https://github.com/infinitetoken/Lumber-Python/archive/0.0.2.tar.gz',
     keywords = ['LUMBER', 'LOGGING', 'LOG', 'CLOUD', 'OUTPUT'],
     packages=setuptools.find_packages(),
     install_requires=[ 'requests' ],
