@@ -19,15 +19,15 @@ class Lumber:
 
     def log(self, message, code=None, level=0):
         if level == 1:
-            logger.debug(u'\x1b[34m{}\x1b[39m'.format(message))
+            logger.debug(f'\x1b[34m{message}\x1b[39m')
         elif level == 2:
             logger.log(logging.DEBUG + 5, message)
         elif level == 3:
-            logger.warning(u'\x1b[33m{}\x1b[39m'.format(message))
+            logger.warning(f'\x1b[33m{message}\x1b[39m')
         elif level == 4:
-            logger.error(u'\x1b[31m{}\x1b[39m'.format(message))
+            logger.error(f'\x1b[31m{message}\x1b[39m')
         elif level == 5:
-            logger.critical(u'\x1b[38;5;208m{}\x1b[39m'.format(message))
+            logger.critical(f'\x1b[38;5;208m{message}\x1b[39m')
         else:
             logger.info(message)
 
