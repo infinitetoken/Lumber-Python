@@ -2,3 +2,5 @@
 .env
 .development.env
 .production.env
+dist
+lumber_cloud.egg-info
