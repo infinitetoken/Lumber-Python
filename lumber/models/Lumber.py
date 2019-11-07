@@ -1,5 +1,5 @@
 import requests
-# import traceback
+from ..helpers import trace
 
 def init(token):
     return Lumber(token)
@@ -10,8 +10,8 @@ class Lumber:
 
     def __init__(self, token, options={}):
         self.token = 'Bearer ' + token
-        self.local = True if options.local else False
-        self.cloud = True if options.cloud else False
+        self.local = True if 'local' in options and options.local else False
+        self.cloud = True if 'cloud' in options and options.cloud else False
 
     def log(self, message, code=None, level=0):
         if level == 1:
@@ -26,13 +26,13 @@ class Lumber:
             print(message)
 
     def logCloud(self, message, code=None, level=0):
-        # trace = traceback.extract_stack(limit=3)
+        t = trace()
         payload = {
             'code': code,
             'level': level,
             'message': message,
-            'line': trace[0][1],
-            'method': trace[0][2]
+            'line': t['line'],
+            'method': t['method']
         }
         headers = {'Authorization': self.token}
         response = requests.post(Lumber.url, json=payload, headers=headers)
