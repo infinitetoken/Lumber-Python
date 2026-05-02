@@ -1,7 +1,9 @@
 *.pyc
+__pycache__/
 .env
 .development.env
 .production.env
-dist
-lumber_cloud.egg-info
+dist/
+*.egg-info/
+.venv/
 test.py

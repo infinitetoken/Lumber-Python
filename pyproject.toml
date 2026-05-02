@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lumber-cloud"
+version = "1.0.0"
+description = "Python logging plugin for Lumber — end-to-end encrypted cloud logging"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    { name = "InfiniteToken", email = "infinitetoken@gmail.com" }
+]
+keywords = ["lumber", "logging", "cloud", "encrypted", "AES"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "cryptography>=41.0",
+    "requests>=2.28",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://github.com/infinitetoken/Lumber-Python"
+Repository = "https://github.com/infinitetoken/Lumber-Python"
+
+[tool.hatch.build.targets.wheel]
+packages = ["lumber_cloud"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
