@@ -32,7 +32,7 @@ class LumberClient:
         self,
         token: str,
         key: str,
-        endpoint: str = "https://lumber-api.vercel.app",
+        endpoint: str = "https://api.lumber.infinitetoken.com",
     ) -> None:
         # Fail fast: validate key decodes to 32 bytes before spinning up the thread
         key_bytes = base64.b64decode(key)
