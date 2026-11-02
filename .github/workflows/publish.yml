@@ -1,0 +1,27 @@
+name: Publish
+run-name: Publish ${{ github.ref_name }}
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install -e . pytest jsonschema build
+      - run: pytest
+      # The tag must be the version being published
+      - run: test "v$(python -c 'import lumber_cloud; print(lumber_cloud.__version__)')" = "${GITHUB_REF_NAME}"
+      - run: python -m build
+      # PyPI trusted publishing: no token, PyPI checks this workflow's identity
+      - uses: pypa/gh-action-pypi-publish@release/v1

@@ -4,39 +4,70 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lumber-cloud"
-version = "1.0.0"
-description = "Python logging plugin for Lumber — end-to-end encrypted cloud logging"
+dynamic = ["version"]
+description = "Python client for Lumber: end-to-end encrypted cloud logging, with a logging handler"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
-authors = [
-    { name = "InfiniteToken", email = "infinitetoken@gmail.com" }
-]
-keywords = ["lumber", "logging", "cloud", "encrypted", "AES"]
+authors = [{ name = "Jay Deaton" }]
+keywords = ["lumber", "logging", "logging-handler", "cloud-logging", "encryption", "aes-256-gcm", "end-to-end-encryption"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: System :: Logging",
+    "Typing :: Typed",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-    "cryptography>=41.0",
-    "requests>=2.28",
-]
+dependencies = ["cryptography>=42"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8", "jsonschema>=4.20", "ruff>=0.6", "mypy>=1.11"]
 
 [project.urls]
-Homepage = "https://github.com/infinitetoken/Lumber-Python"
+Homepage = "https://lumber.infinitetoken.com"
+Documentation = "https://lumber.infinitetoken.com/docs/getting-started"
 Repository = "https://github.com/infinitetoken/Lumber-Python"
+
+[tool.hatch.version]
+path = "lumber_cloud/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["lumber_cloud"]
 
+[tool.hatch.build.targets.sdist]
+include = ["lumber_cloud", "tests", "README.md", "LICENSE"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.format]
+# The README's examples line up their comments, which the formatter would undo
+exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["SIM105"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["RUF012"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["lumber_cloud"]
+
+[[tool.mypy.overrides]]
+module = "certifi"
+ignore_missing_imports = true

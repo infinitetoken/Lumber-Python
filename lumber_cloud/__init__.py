@@ -1,80 +1,88 @@
-"""
-lumber-cloud — Python logging plugin for Lumber.
+"""Lumber for Python: end-to-end encrypted cloud logging.
 
-Usage:
-    from lumber_cloud import LumberClient, LogLevel
+    import lumber_cloud as lumber
 
-    lumber = LumberClient(
-        token="your-app-token",
-        key="your-base64-encryption-key",
-    )
-    lumber.log("Something happened", level=LogLevel.Info)
+    lumber.config(api_key=os.environ["LUMBER_API_KEY"])
+    lumber.info("Server started", port=8000)
+
+Or send `logging` to Lumber with LumberHandler, or make your own LumberClient.
 """
 
-import base64
+from __future__ import annotations
 
-from .encrypt import encrypt_payload
-from .queue import LogQueue
-from .types import LogLevel
+from typing import Any
 
-__all__ = ['LumberClient', 'LogLevel']
+from ._version import __version__
+from .client import LogLevel, LumberClient
+from .handler import LumberHandler, lumber_level
+
+__all__ = [
+    "LogLevel",
+    "LumberClient",
+    "LumberHandler",
+    "__version__",
+    "config",
+    "critical",
+    "debug",
+    "error",
+    "exception",
+    "fatal",
+    "flush",
+    "info",
+    "lumber_level",
+    "warn",
+    "warning",
+]
+
+_client: LumberClient | None = None
 
 
-class LumberClient:
+def config(api_key: str, **options: Any) -> LumberClient:
+    """Sets up the shared client the module's functions log with, and returns it. Takes LumberClient's options.
+
+    Calling it again replaces the client: logs still queued in the old one keep sending in the background, but flush()
+    only waits for the new one's.
     """
-    Encrypts log payloads with AES-256-GCM and sends them to the Lumber API
-    on a daemon background thread. All log() calls return immediately.
+    global _client
+    _client = LumberClient(api_key, **options)
+    return _client
 
-    Constructor raises ValueError if key does not decode to exactly 32 bytes.
-    """
 
-    def __init__(
-        self,
-        token: str,
-        key: str,
-        endpoint: str = "https://api.lumber.infinitetoken.com",
-    ) -> None:
-        # Fail fast: validate key decodes to 32 bytes before spinning up the thread
-        key_bytes = base64.b64decode(key)
-        if len(key_bytes) != 32:
-            raise ValueError(
-                f"Invalid encryption key: expected 32 bytes after base64 decode, "
-                f"got {len(key_bytes)}. Pass the key exactly as returned by POST /apps."
-            )
-        self._key   = key
-        self._queue = LogQueue(token, endpoint)
+def _shared() -> LumberClient:
+    if _client is None:
+        raise RuntimeError("[lumber] Call lumber_cloud.config() before logging.")
+    return _client
 
-    def log(
-        self,
-        message: str = None,
-        *,
-        code:    str = None,
-        line:    int = None,
-        column:  int = None,
-        method:  str = None,
-        note:    str = None,
-        level:   LogLevel = LogLevel.Info,
-        flagged: bool = False,
-    ) -> None:
-        """
-        Encrypts and enqueues a log entry. Returns immediately. Never raises.
 
-        Only non-None fields are included in the encrypted payload, matching
-        Lumber-Node's behavior where undefined fields are absent from JSON.stringify().
-        """
-        payload = {
-            k: v for k, v in {
-                'message': message,
-                'code':    code,
-                'line':    line,
-                'column':  column,
-                'method':  method,
-                'note':    note,
-            }.items() if v is not None
-        }
-        try:
-            encrypted = encrypt_payload(payload, self._key)
-        except Exception:
-            # encrypt_payload only raises on key length errors caught at __init__ — defensive
-            return
-        self._queue.enqueue(encrypted, int(level), flagged)
+def debug(message: Any, /, **data: Any) -> None:
+    _shared()._log(LogLevel.DEBUG, message, data)
+
+
+def info(message: Any, /, **data: Any) -> None:
+    _shared()._log(LogLevel.INFO, message, data)
+
+
+def warn(message: Any, /, **data: Any) -> None:
+    _shared()._log(LogLevel.WARN, message, data)
+
+
+def error(message: Any, /, **data: Any) -> None:
+    _shared()._log(LogLevel.ERROR, message, data)
+
+
+def exception(message: Any, /, **data: Any) -> None:
+    data.setdefault("exc_info", True)
+    _shared()._log(LogLevel.ERROR, message, data)
+
+
+def fatal(message: Any, /, **data: Any) -> None:
+    _shared()._log(LogLevel.FATAL, message, data)
+
+
+warning = warn
+critical = fatal
+
+
+def flush(timeout: float | None = None) -> bool:
+    """Waits until every log the shared client queued is sent. False when `timeout` seconds ran out first."""
+    return _shared().flush(timeout)
