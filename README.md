@@ -119,7 +119,7 @@ lumber.config(
 
 ## Delivery
 
-Logs are sent in order, one `POST /logs` per log, from a daemon thread over a connection kept open between logs. A network error or a 5xx counts as a failed attempt: each log gets 5, waiting 1, 2, 4, then 8 seconds between them, and is then dropped with a warning on stderr. A log Lumber refuses (a 4xx, such as an invalid API key) is dropped at once with a warning, since sending it again won't help. When your team has sent its plan's logs for the month, Lumber answers 429: the client warns once and drops logs until the month turns. While Lumber can't be reached, up to `max_queue` logs wait; past that, new ones are dropped.
+Logs are sent in order, one `POST /logs` per log, from a daemon thread over a connection kept open between logs. A network error or a 5xx counts as a failed attempt: each log gets 5, waiting 1, 2, 4, then 8 seconds between them, and is then dropped with a warning on stderr. A log Lumber refuses (a 4xx, such as an invalid API key, or a 413 for a log over 16 KB once encrypted) is dropped at once with a warning, since sending it again won't help. Errors always get through: past your team's monthly logs, Lumber still takes error and fatal logs, and answers the rest 200 without keeping them, so the client carries on with no warning (the Lumber app shows when your team is at its limit). At twice your team's monthly logs Lumber answers 429: the client warns once and drops logs until the month turns. While Lumber can't be reached, up to `max_queue` logs wait; past that, new ones are dropped.
 
 Forking servers (gunicorn, uWSGI) are handled: a worker process starts its own sending thread and connection with its first log.
 
